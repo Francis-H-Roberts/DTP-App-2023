@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Frank Notes Site</title>
+        <link rel="stylesheet" href="/static/css/style.css">
+    </head>
+
+    <body>
+        <header>
+            {% include "base_templates/header.html"%}
+        </header>
+        <nav>
+            {% include "base_templates/nav.html"%}
+        </nav>
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
+        <footer>
+            {% include "base_templates/footer.html"%}
+        </footer>
+    </body>
+
+</html>
