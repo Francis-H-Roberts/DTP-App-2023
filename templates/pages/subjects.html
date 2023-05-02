@@ -1,3 +1,7 @@
 {% extends 'base_templates/layout.html' %}
 {% block content %}
+<h1>All Subjects</h1>
+{% for subject in subjects %}
+<a href="/subject/{{subject[0]}}">{{subject[1]}}</a>
+{% endfor %}
 {% endblock %}
