@@ -1,6 +1,6 @@
 {% extends 'base_templates/layout.html' %}
 {% block content %}
-<h1>{{infoname[0][0]}}</h1>
+<h1>{{infoname[0][0]}} <a href="/edit-tag/{{id}}">Edit</a></h1>
 <h2>{{infoname[0][1]}}</h2>
 {% for entry in entries %}
 <a href="/entry/{{entry[0]}}">{{entry[1]}}</a>

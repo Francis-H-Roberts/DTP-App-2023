@@ -1,6 +1,6 @@
 {% extends 'base_templates/layout.html' %}
 {% block content %}
-<h1>{{information[0][0]}}</h1>
+<h1>{{information[0][0]}} <a href="/edit-entry/{{id}}">Edit</a></h1>
 {% for tag in tags %}
 <a href="/tag/{{tag[0]}}">{{tag[1]}}</a>
 {% endfor %}
