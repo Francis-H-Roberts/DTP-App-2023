@@ -1,3 +1,10 @@
 {% extends 'base_templates/layout.html' %}
 {% block content %}
+<form method="post">
+    <input type="text" name="name" placeholder="Name of Tag...">
+    </br>
+    <textarea name="info" rows="10" cols="50" placeholder="Description of tag here..."></textarea>
+    </br>
+    <input type="submit">
+</form>
 {% endblock %}
