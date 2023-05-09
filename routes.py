@@ -53,27 +53,21 @@ def home():
     return render_template('pages/home.html')
 
 
-#displays all subjects
-@app.route('/all-subjects')
-def subjects():
-    subjects = retrievenop('SELECT id, name FROM SUBJECT')
-    return render_template('pages/subjects.html',subjects=subjects)
+#displays the contents of the root folder
+@app.route('/main-directory')
+def root():
+    folders = retrievenop('SELECT id, name FROM FOLDER WHERE parent_id = 1')
+    entries = retrievenop('SELECT id, name FROM ENTRY WHERE parent_id = 1')
+    return render_template('pages/root.html',folders=folders,entries=entries,id=1)
 
 
-#displays the categories within the subject with its id in the route
-@app.route('/subject/<int:id>')
-def subject(id):
-    infoname = retrieve("SELECT info, name FROM SUBJECT WHERE id = ?", (id,))
-    categories = retrieve("SELECT id, name FROM CATEGORY WHERE subject_id = ?", (id,))
-    return render_template('pages/subject.html',infoname=infoname,categories=categories)
-
-
-#displays the entries within the category with its id in the route 
-@app.route('/category/<int:id>')
-def category(id):
-    infoname = retrieve("SELECT name, info FROM CATEGORY WHERE id = ?", (id,))
-    entries = retrieve("SELECT id, name FROM ENTRY WHERE category_id = ?", (id,))
-    return render_template('pages/category.html',infoname=infoname,entries=entries,id=id)
+#displays the folders/entries within the folder with its id in the route
+@app.route('/folder/<int:id>')
+def folder(id):
+    infoname = retrieve("SELECT name,info FROM FOLDER WHERE id = ?", (id,))[0]
+    folders = retrieve("SELECT id, name FROM FOLDER WHERE parent_id = ?", (id,))
+    entries = retrieve("SELECT id, name FROM ENTRY WHERE parent_id = ?", (id,))
+    return render_template('pages/folder.html',infoname=infoname,folders=folders,entries=entries,id=id)
 
 
 #displays the entry that has its id in the route
@@ -97,7 +91,7 @@ def create(id):
 def create_entry(id):  
     name = request.form.get('name')
     entry = request.form.get('entry')
-    insert("INSERT INTO ENTRY(category_id,name,entry) VALUES (?,?,?)",(id,name,entry))
+    insert("INSERT INTO ENTRY(parent_id,name,entry) VALUES (?,?,?)",(id,name,entry))
     enter_tags(max(retrievenop("SELECT id FROM ENTRY"))[0])
     return render_template('pages/home.html')
 

@@ -1,8 +1,0 @@
-{% extends 'base_templates/layout.html' %}
-{% block content %}
-<h1>{{infoname[0][1]}}</h1>
-<h2>{{infoname[0][0]}}</h2>
-{% for category in categories %}
-<a href="/category/{{category[0]}}">{{category[1]}}</a>
-{% endfor %}
-{% endblock %}
