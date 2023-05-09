@@ -1,7 +1,16 @@
 {% extends 'base_templates/layout.html' %}
 {% block content %}
 <form method="post">
-    <input type="text" name="name" value="{{information[0][0]}}">
+    {% for folder in folders %}
+        {% if folder[0]==information[0]: %}
+            <input type="radio" id="folder{{folder[0]}}" name="folder" value={{folder[0]}} checked>
+        {% else %}
+            <input type="radio" id="folder{{folder[0]}}" name="folder" value={{folder[0]}}>
+        {% endif %}
+        <label for="folder{{folder[0]}}">{{folder[1]}}</label>
+    {% endfor %}
+    <br>
+    <input type="text" name="name" value="{{information[1]}}">
     </br>
     {% for tag in all_tags %}
         {% if tag in tags:%}
@@ -12,7 +21,7 @@
         <label for="tag{{tag[0]}}">{{tag[1]}}</label>
     {% endfor %}
     </br>
-    <textarea name="entry" rows="10" cols="50">{{information[0][1]}}</textarea>
+    <textarea name="entry" rows="10" cols="50">{{information[2]}}</textarea>
     </br>
     <input type="submit">
 </form>

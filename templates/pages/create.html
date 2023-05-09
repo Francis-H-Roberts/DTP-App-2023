@@ -1,15 +1,24 @@
 {% extends 'base_templates/layout.html' %}
 {% block content %}
 <form method="post">
-<input type="text" name="name" placeholder="Title of entry...">
-</br>
-{% for tag in tags %}
-<input type="checkbox" name="tag{{tag[0]}}" value={{tag[0]}}>
-<label for="tag{{tag[0]}}">{{tag[1]}}</label>
-{% endfor %}
-</br>
-<textarea name="entry" rows="10" cols="50" placeholder="Body of entry here..."></textarea>
-</br>
-<input type="submit">
+    {% for folder in folders %}
+        {% if folder[0]==id: %}
+            <input type="radio" id="folder{{folder[0]}}" name="folder" value={{folder[0]}} checked>
+        {% else %}
+            <input type="radio" id="folder{{folder[0]}}" name="folder" value={{folder[0]}}>
+        {% endif %}
+        <label for="folder{{folder[0]}}">{{folder[1]}}</label>
+    {% endfor %}
+    </br>
+    <input type="text" name="name" placeholder="Title of entry...">
+    </br>
+    {% for tag in tags %}
+        <input type="checkbox" name="tag{{tag[0]}}" value={{tag[0]}}>
+        <label for="tag{{tag[0]}}">{{tag[1]}}</label>
+    {% endfor %}
+    </br>
+    <textarea name="entry" rows="10" cols="50" placeholder="Body of entry here..."></textarea>
+    </br>
+    <input type="submit">
 </form>
 {% endblock %}

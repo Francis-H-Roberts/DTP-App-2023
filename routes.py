@@ -70,6 +70,36 @@ def folder(id):
     return render_template('pages/folder.html',infoname=infoname,folders=folders,entries=entries,id=id)
 
 
+@app.route('/create-folder/<int:id>')
+def create_folder(id):
+    parents = retrievenop("SELECT id, name FROM FOLDER")
+    return render_template('pages/create_folder.html',id=id,parents=parents)
+
+
+@app.route('/create-folder/<int:id>',methods=["POST"])
+def folder_created(id): 
+    name = request.form.get('name')
+    info = request.form.get('entry')
+    insert("INSERT INTO FOLDER(parent_id,name,info) VALUES (?,?,?)",(id,name,info))
+    return render_template('pages/home.html')
+
+
+@app.route('/edit-folder/<int:id>')
+def edit_folder(id):
+    info = retrieve("SELECT parent_id,name,info FROM FOLDER WHERE id = ?",(id,))[0]
+    folders = retrievenop('SELECT id, name FROM FOLDER')
+    return render_template('pages/edit_folder.html',info=info,parents=folders)
+
+
+@app.route('/edit-folder/<int:id>',methods=["POST"])
+def folder_edited(id):
+    parent_id = request.form.get('parent')
+    name = request.form.get('name')
+    info = request.form.get('entry')
+    insert("UPDATE FOLDER SET (parent_id,name,info) = (?,?,?) WHERE id = ?",(parent_id,name,info,id))
+    return render_template('pages/home.html')
+
+
 #displays the entry that has its id in the route
 @app.route('/entry/<int:id>')
 def entry(id):
@@ -80,17 +110,19 @@ def entry(id):
 
 #displays a form with the parameters for an entry
 @app.route('/create-entry/<int:id>')
-def create(id):
+def create_entry(id):
     tags = retrievenop('SELECT id, name FROM TAG')
-    return render_template('pages/create.html',tags=tags,id=id)
+    folders = retrievenop('SELECT id, name FROM FOLDER')
+    return render_template('pages/create.html',tags=tags,id=id,folders=folders)
 
 
 #I gained my understanding of forms from https://discuss.codecademy.com/t/what-happens-after-submit-is-pressed-where-does-the-information-go/478914/2
 #and how they work in flask from https://plainenglish.io/blog/how-to-create-a-basic-form-in-python-flask-af966ee493fa
 @app.route('/create-entry/<int:id>',methods=["POST"])
-def create_entry(id):  
+def entry_creation(id):  
     name = request.form.get('name')
     entry = request.form.get('entry')
+    id = request.form.get('folder')
     insert("INSERT INTO ENTRY(parent_id,name,entry) VALUES (?,?,?)",(id,name,entry))
     enter_tags(max(retrievenop("SELECT id FROM ENTRY"))[0])
     return render_template('pages/home.html')
@@ -99,10 +131,11 @@ def create_entry(id):
 #A page that provides a form for editing an existing entry
 @app.route('/edit-entry/<int:id>')
 def edit_entry(id):
-    information = retrieve("SELECT name, entry FROM ENTRY WHERE id = ?",(id,))
+    information = retrieve("SELECT parent_id, name, entry FROM ENTRY WHERE id = ?",(id,))[0]
     tags = retrieve("SELECT id, name FROM ENTRYTAG\nJOIN TAG ON TAG.id = tag_id\nWHERE entry_id = ?",(id,))
     all_tags = retrievenop('SELECT id, name FROM TAG')
-    return render_template('pages/edit.html',information=information,tags=tags,all_tags=all_tags)
+    folders = retrievenop('SELECT id, name FROM FOLDER')
+    return render_template('pages/edit.html',information=information,tags=tags,all_tags=all_tags,folders=folders)
 
 
 #edits an entry based on entered info
@@ -110,7 +143,8 @@ def edit_entry(id):
 def entry_edited(id):
     name = request.form.get('name')
     entry = request.form.get('entry')
-    insert("UPDATE ENTRY SET (name,entry) = (?,?) WHERE id = ?",(name,entry,id))
+    parent_id = request.form.get('folder')
+    insert("UPDATE ENTRY SET (parent_id,name,entry) = (?,?,?) WHERE id = ?",(parent_id,name,entry,id))
     insert("DELETE FROM ENTRYTAG WHERE entry_id = ?",(id,))
     enter_tags(id)
     return render_template('pages/home.html')
