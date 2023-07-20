@@ -1,9 +1,14 @@
 {% extends 'base_templates/layout.html' %}
 {% block content %}
-<h1>{{information[0][0]}} <a href="/edit-entry/{{id}}">Edit</a></h1>
-{% for tag in tags %}
-<a href="/tag/{{tag[0]}}">{{tag[1]}}</a>
-{% endfor %}
-</br>
-{{information[0][1]}}
+<p>
+    {% for parent in ancestry %}
+        <a href="/folder/{{parent[0]}}">{{parent[1]}}</a> >
+    {% endfor %}
+    <h1>{{information[0][0]}} <a href="/edit-entry/{{id}}">Edit</a></h1>
+    {% for tag in tags %}
+        <a href="/tag/{{tag[0]}}">{{tag[1]}}</a>
+    {% endfor %}
+    </br>
+    {{information[0][1]}}
+</p>
 {% endblock %}

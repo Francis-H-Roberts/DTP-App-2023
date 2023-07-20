@@ -1,5 +1,8 @@
 {% extends 'base_templates/layout.html' %}
 {% block content %}
+{% for parent in ancestry %}
+<a href="/folder/{{parent[0]}}">{{parent[1]}}</a> >
+{% endfor %}
 <h1>{{infoname[0]}} <a href="/edit-folder/{{id}}">edit</a></h1>
 <h2>{{infoname[1]}}</h2>
 {% for folder in folders %}
