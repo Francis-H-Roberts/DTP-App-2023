@@ -1,8 +1,18 @@
 {% extends 'base_templates/layout.html' %}
 {% block content %}
-<h1>All Tags</h1>
-{% for tag in tags %}
-<a href="/tag/{{tag[0]}}">{{tag[1]}}</a>
-{% endfor %}
-<a href="/create-tag">Add a tag...</a>
+
+<div class="info">
+    <h1>All Tags</h1>
+</div>
+
+<div class="links">
+
+    {% for tag in tags %}
+        <a href="/tag/{{tag[0]}}">{{tag[1]}}</a>
+    {% endfor %}
+
+    <a href="/create-tag">Add a tag...</a>
+
+</div>
+
 {% endblock %}

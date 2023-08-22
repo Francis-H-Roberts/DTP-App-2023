@@ -9,16 +9,18 @@
         <header>
             {% include "base_templates/header.html"%}
         </header>
-        <nav>
-            {% include "base_templates/nav.html"%}
-        </nav>
-        <main>
-            {% block content %}
-            {% endblock %}
-        </main>
+        <div class="page">
+            <nav>
+                {% include "base_templates/nav.html"%}
+            </nav>
+            <div class="content">
+                {% block content %}
+                {% endblock %}
+            </div>
         <footer>
             {% include "base_templates/footer.html"%}
         </footer>
+        </div>
     </body>
 
 </html>

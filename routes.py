@@ -1,6 +1,6 @@
 # http://127.0.0.1:5000
 from flask import Flask, render_template
-from flask import request
+from flask import request, redirect, url_for
 import sqlite3
 
 # https://learnsql.com/blog/query-parent-child-tree/    <----- for folder hierarchy
@@ -36,7 +36,8 @@ def enter_tags(id):
     # Got the keys bit from https://stackoverflow.com/questions/58160006/how-to-get-multiple-elements-from-a-form-using-request-form-get
     keys = request.form.keys()
     for key in keys:
-        if key != 'name' and key != 'entry': 
+        if key != 'name' and key != 'entry' and key !='folder': 
+            print(key)
             tag = request.form.get(key)
             insert("INSERT INTO ENTRYTAG(tag_id,entry_id) VALUES (?,?)", (tag, id))
 
@@ -48,11 +49,11 @@ def home():
 
 
 # displays the contents of the root folder
-@app.route('/main-directory')
-def root():
-    folders = retrieve('SELECT id, name FROM FOLDER WHERE parent_id = 1')
-    entries = retrieve('SELECT id, name FROM ENTRY WHERE parent_id = 1')
-    return render_template('pages/root.html', folders=folders, entries=entries, id=1)
+# @app.route('/main-directory')
+# def root():
+#     folders = retrieve('SELECT id, name FROM FOLDER WHERE parent_id = 1')
+#     entries = retrieve('SELECT id, name FROM ENTRY WHERE parent_id = 1')
+#     return render_template('pages/root.html', folders=folders, entries=entries, id=1)
 
 
 # displays the folders/entries within the folder with its id in the route
@@ -60,12 +61,16 @@ def root():
 @app.route('/folder/<int:id>')
 def folder(id):
     infoname = retrieve("SELECT name,info FROM FOLDER WHERE id = ?", (id,))[0]
-    folders = retrieve("SELECT id,name FROM FOLDER WHERE parent_id = ?", (id,))
+    folders = retrieve("SELECT id,name,colour FROM FOLDER WHERE parent_id = ?", (id,))
     entries = retrieve("SELECT id,name FROM ENTRY WHERE parent_id = ?", (id,))
     ancestry = retrieve("WITH RECURSIVE generation AS (SELECT id,name,parent_id FROM FOLDER WHERE id = (SELECT parent_id FROM FOLDER WHERE id = ?) UNION ALL SELECT parent.id,parent.name,parent.parent_id FROM FOLDER parent JOIN generation g ON g.parent_id = parent.id) SELECT id,name FROM generation",(id,))
     # ron for reverse
     ancestry.reverse()
-    return render_template('pages/folder.html', infoname=infoname, folders=folders, entries=entries, id=id, ancestry=ancestry)
+    if len(ancestry) != 0:
+        ancestors = True
+    else:
+        ancestors = False
+    return render_template('pages/folder.html', infoname=infoname, folders=folders, entries=entries, id=id, ancestry=ancestry,ancestors=ancestors)
 
 
 # displays a form for creating a folder 
@@ -81,7 +86,8 @@ def folder_created(id):
     name = request.form.get('name')
     info = request.form.get('entry')
     insert("INSERT INTO FOLDER(parent_id,name,info) VALUES (?,?,?)", (id, name, info))
-    return render_template('pages/home.html')
+    id = max(retrieve("SELECT id FROM FOLDER"))[0]
+    return redirect(url_for('folder',id=id))
 
 
 # creates a form with prefilled values of a folder for the user to edit
@@ -98,7 +104,8 @@ def folder_edited(id):
     name = request.form.get('name')
     info = request.form.get('entry')
     insert("UPDATE FOLDER SET (parent_id,name,info) = (?,?,?) WHERE id = ?", (parent_id, name, info,id))
-    return render_template('pages/home.html')
+    #https://stackoverflow.com/questions/48148131/how-can-we-call-one-route-from-another-route-with-parameters-in-flask
+    return redirect(url_for('folder',id=id))
 
 
 # displays the entry that has its id in the route
@@ -123,20 +130,21 @@ def create_entry(id):
 # I gained my understanding of forms from https://discuss.codecademy.com/t/what-happens-after-submit-is-pressed-where-does-the-information-go/478914/2
 # and how they work in flask from https://plainenglish.io/blog/how-to-create-a-basic-form-in-python-flask-af966ee493fa
 @app.route('/create-entry/<int:id>', methods=["POST"])
-def entry_creation(id):  
+def entry_created(id):  
     name = request.form.get('name')
     entry = request.form.get('entry')
     id = request.form.get('folder')
 
     insert("INSERT INTO ENTRY(parent_id,name,entry) VALUES (?,?,?)", (id, name, entry))
-    enter_tags(max(retrieve("SELECT id FROM ENTRY"))[0])
-    return render_template('pages/home.html')
+    id = max(retrieve("SELECT id FROM ENTRY"))[0]
+    enter_tags(id)
+    return redirect(url_for('entry',id=id))
 
 
 # A page that provides a form for editing an existing entry
 @app.route('/edit-entry/<int:id>')
 def edit_entry(id):
-    information = retrieve("SELECT parent_id, name, entry FROM ENTRY WHERE id = ?", (id,))
+    information = retrieve("SELECT parent_id, name, entry FROM ENTRY WHERE id = ?", (id,))[0]
     tags = retrieve("SELECT id, name FROM ENTRYTAG JOIN TAG ON TAG.id = tag_id WHERE entry_id = ?", (id,))
     all_tags = retrieve('SELECT id, name FROM TAG')
     folders = retrieve('SELECT id, name FROM FOLDER')
@@ -152,13 +160,13 @@ def entry_edited(id):
     insert("UPDATE ENTRY SET (parent_id,name,entry) = (?,?,?) WHERE id = ?", (parent_id, name, entry, id))
     insert("DELETE FROM ENTRYTAG WHERE entry_id = ?", (id,))
     enter_tags(id)
-    return render_template('pages/home.html')
+    return redirect(url_for('entry',id=id))
 
 
 # displays all tags
 @app.route('/all-tags')
 def tags():
-    tags = retrieve('SELECT id, name FROM TAG')
+    tags = retrieve('SELECT id, name FROM TAG') 
     return render_template('pages/tags.html', tags=tags)
 
 
@@ -178,11 +186,12 @@ def create_tag():
 
 # enters the information from a submitted one of the form above into the db
 @app.route('/create-tag', methods=["POST"])
-def tag_creation():
+def tag_created():
     name = request.form.get('name')
     info = request.form.get('info')
     insert("INSERT INTO TAG(name,info) VALUES (?,?)", (name, info))
-    return render_template('pages/home.html')
+    id = max(retrieve("SELECT id FROM TAG"))[0]
+    return redirect(url_for('tag',id=id))
 
 
 # A page that provides a form for editing an existing tag
@@ -198,7 +207,7 @@ def tag_edited(id):
     name = request.form.get('name')
     info = request.form.get('info')
     insert("UPDATE TAG SET (name,info) = (?,?) WHERE id = ?", (name, info, id))
-    return render_template('pages/home.html')
+    return redirect(url_for('tag',id=id))
 
 
 if __name__ == '__main__':
