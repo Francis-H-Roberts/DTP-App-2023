@@ -28,6 +28,7 @@ html,body{
 
 .content{
     /* padding: 20px 0 20px 10px;  */
+    /* position: absolute; */
     background-color:#f5f5f5ff;
     border-left: 1px solid #5D6063;
     border-right: 1px solid #5D6063;
@@ -38,6 +39,9 @@ html,body{
     flex-direction: column;
     /* justify-content: center; */
     flex-wrap: wrap;
+    padding: 0px 0px 20px;
+    /* top: 100px; */
+    /* overflow: hidden; */
 }
 
 .tags{
@@ -69,10 +73,26 @@ input[type=text]{
     font-size: 1.5em;
 }
 
+input[type=submit]{
+    background-color: #5D6063;
+    color: whitesmoke;
+    border: #5D6063 2px solid;
+    font-size: 1.4em;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 5px;
+}
+
+input[type=submit]:hover{
+    border: #000 2px solid;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
 textarea{
     font-size: 1.5em;
     text-align: left;
-    padding: 5px;
+    padding: 10px;
+    margin: 0px 10px 0px 10px;
 }
 
 .footer{
@@ -102,8 +122,8 @@ h1{
 .entry{
     /* https://stackoverflow.com/questions/12202844/style-text-inside-a-textarea */
     white-space: pre-line;
-    /* text-align: left; */
-    padding: 0px 20px 0px 20px;
+    text-align: left;
+    padding: 0px 150px 0px 150px;
     font-size: 1.5em;
 }
 
@@ -114,6 +134,62 @@ h1{
     justify-content: left;
     flex-wrap: wrap;
     gap: 5px;
+}
+
+/* dropdown is based heavily off w3 schools dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+a.dropdown {
+    /* margin: 12px; */
+    padding: 5px 7px 5px 7px;
+    text-decoration: none;
+    border:2px solid #5D6063;
+    background-color: #5D6063;
+    color: #fff;
+    /* border-radius: 5px; */
+    font-size: 1.2em;
+}
+
+a.dropdown:hover{
+    border: #000000 solid 2px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 220px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.show {
+    display: flex;
+    flex-direction: column;
+    /* gap: 3px; */
+    border-bottom: #5D6063 1px solid;
+    border-collapse: collapse;
+    overflow-y: scroll;
+    max-height: 400px;
+    font-size: 0.8em;
+}
+
+.item{
+    display: flex;
+    justify-content: left;
+    gap: 5px;
+    /* margin: 0 0 0 5px; */
+    border: #5D6063 1px solid;
+    border-bottom: 0px;
+    padding: 3px;
+}
+
+.item label{
+    text-align: left;
 }
 
 .ancestry a{
@@ -157,7 +233,7 @@ h1{
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    background-color: #414141;
+    background-color: #cecece;
 
 }
 
@@ -182,6 +258,7 @@ h1{
     font-size: xx-large;
     display: flex;
     flex-direction: row;
+    /* position: absolute; */
 }
 
 .nav-buttons a{

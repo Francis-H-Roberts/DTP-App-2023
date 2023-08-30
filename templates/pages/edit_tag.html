@@ -1,10 +1,8 @@
 {% extends 'base_templates/layout.html' %}
 {% block content %}
 <form method="post">
-    <input type="text" name="name" value="{{info[0]}}">
-    </br>
-    <textarea name="info" rows="10" cols="50">{{info[1]}}</textarea>
-    </br>
+    <div class="info"><input type="text" name="name" value="{{info[0]}}"></div>
+    <textarea name="info" rows="10" cols="90">{{info[1]}}</textarea>
     <input type="submit">
 </form>
 {% endblock %}

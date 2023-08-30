@@ -42,18 +42,20 @@ def enter_tags(id):
             insert("INSERT INTO ENTRYTAG(tag_id,entry_id) VALUES (?,?)", (tag, id))
 
 
-# home not a whole lot going on atm
+# https://www.geeksforgeeks.org/python-404-error-handling-in-flask/
+@app.errorhandler(404)
+def error_404(e):
+    return render_template('pages/page_not_found.html')
+
+
+# default page redirects to main directory
 @app.route('/')
+def main_directory():
+    return redirect(url_for('folder',id=1))
+
+@app.route('/home')
 def home():
     return render_template('pages/home.html')
-
-
-# displays the contents of the root folder
-# @app.route('/main-directory')
-# def root():
-#     folders = retrieve('SELECT id, name FROM FOLDER WHERE parent_id = 1')
-#     entries = retrieve('SELECT id, name FROM ENTRY WHERE parent_id = 1')
-#     return render_template('pages/root.html', folders=folders, entries=entries, id=1)
 
 
 # displays the folders/entries within the folder with its id in the route
@@ -76,8 +78,11 @@ def folder(id):
 # displays a form for creating a folder 
 @app.route('/create-folder/<int:id>')
 def create_folder(id):
-    parents = retrieve("SELECT id, name FROM FOLDER")
-    return render_template('pages/create_folder.html', id=id, parents=parents)
+    folders = retrieve("SELECT id, name FROM FOLDER")
+    # https://stackoverflow.com/questions/2191699/find-an-element-in-a-list-of-tuples
+    if len([item for item in folders if item[0]==id])==0:
+        id=1
+    return render_template('pages/create_folder.html', id=id, folders=folders)
 
 
 # creates a folder based on submitted values
@@ -94,7 +99,7 @@ def folder_created(id):
 @app.route('/edit-folder/<int:id>')
 def edit_folder(id):
     info = retrieve("SELECT parent_id,name,info FROM FOLDER WHERE id = ?", (id,))[0]
-    folders = retrieve('SELECT id, name FROM FOLDER')
+    folders = retrieve('SELECT id, name FROM FOLDER WHERE id != ?',(id,))
     return render_template('pages/edit_folder.html', info=info, parents=folders)
 
 
@@ -124,7 +129,9 @@ def entry(id):
 def create_entry(id):
     tags = retrieve('SELECT id, name FROM TAG')
     folders = retrieve('SELECT id, name FROM FOLDER')
-    return render_template('pages/create.html', tags=tags, id=id, folders=folders)
+    if len([item for item in folders if item[0]==id])==0:
+        id=1
+    return render_template('pages/create_entry.html', tags=tags, id=id, folders=folders)
 
 
 # I gained my understanding of forms from https://discuss.codecademy.com/t/what-happens-after-submit-is-pressed-where-does-the-information-go/478914/2
@@ -148,7 +155,7 @@ def edit_entry(id):
     tags = retrieve("SELECT id, name FROM ENTRYTAG JOIN TAG ON TAG.id = tag_id WHERE entry_id = ?", (id,))
     all_tags = retrieve('SELECT id, name FROM TAG')
     folders = retrieve('SELECT id, name FROM FOLDER')
-    return render_template('pages/edit.html', information=information, tags=tags, all_tags=all_tags, folders=folders)
+    return render_template('pages/edit_entry.html', information=information, tags=tags, all_tags=all_tags, folders=folders)
 
 
 # edits an entry based on entered info
@@ -197,7 +204,7 @@ def tag_created():
 # A page that provides a form for editing an existing tag
 @app.route('/edit-tag/<int:id>')
 def edit_tag(id):
-    info = retrieve('SELECT name, info FROM TAG WHERE id = ?', (id,))
+    info = retrieve('SELECT name, info FROM TAG WHERE id = ?', (id,))[0]
     return render_template('pages/edit_tag.html', info=info)
 
 

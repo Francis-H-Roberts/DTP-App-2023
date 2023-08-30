@@ -1,16 +1,13 @@
 {% extends 'base_templates/layout.html' %}
 {% block content %}
 <form method="post">
+    
     <div class="info">
-
         <div class="dropdown">
-
             <a class="dropdown" onclick="dropdownp()">
                 Parent ▾
             </a>
-
             <div id="parentdropdown" class="dropdown-content">
-
                 {% for folder in folders %}
                     <div class="item">
                         {% if folder[0]==id: %}
@@ -22,16 +19,28 @@
                         <br>
                     </div>
                 {% endfor %}
-
             </div>
-
         </div>
         
-    <input type="text" name="name" placeholder="Name of folder...">
-    
+        <input type="text" name="name" placeholder="Title of entry...">
+
+        <div class="dropdown">
+            <a class="dropdown" onclick="dropdownt()">
+            Tags ▾
+            </a>
+            <div id="tagsdropdown" class="dropdown-content">
+                {% for tag in tags %}
+                    <div class="item">
+                            <input class="form-check-input" type="checkbox" name="tag{{tag[0]}}" value={{tag[0]}}>
+                            <label class="form-check-label" for="tag{{tag[0]}}">{{tag[1]}}</label>
+                            <br>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-        
-    <textarea name="entry" rows="5" cols="90" placeholder="Description of Folder..."></textarea>
+
+    <textarea name="entry" rows="25" cols="90" placeholder="Body of entry..."></textarea>
 
     <input type="submit">
 </form>
